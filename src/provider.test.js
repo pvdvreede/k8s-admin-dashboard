@@ -41,9 +41,9 @@ describe('update_one', () => {
     return subj(UPDATE, 'api/v1/nodes', {
       id: 'test-node-1',
       data: {
-        // spec: {
-        //   unschedulable: true
-        // }
+        spec: {
+          unschedulable: true
+        }
       },
       previousData: {},
     }).then((resp) => {

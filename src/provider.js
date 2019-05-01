@@ -9,9 +9,9 @@ export default (serverUrl) => {
   let transformer = null;
 
   const options = {
-    headers: new Headers({
-      // 'Accept': 'application/json',
-    }),
+    headers: {
+      'Accept': 'application/json',
+    },
   };
 
   return (type, resource, params) => {
@@ -44,10 +44,9 @@ export default (serverUrl) => {
         url = serverUrl + `/${resource}/${params.id}`;
         options.method = 'PATCH';
         options.body = JSON.stringify(params.data);
-        options.headers['content-type'] = 'application/strategic-merge-patch+json';
+        options.headers['Content-Type'] = 'application/strategic-merge-patch+json';
 
         transformer = (response) => {
-          console.log(response)
           response['id'] = response.metadata.name;
           return {
             data: response,
@@ -56,9 +55,6 @@ export default (serverUrl) => {
         break;
       }
     }
-
-    console.log(url);
-    console.log(options);
 
     return fetch(url, options)
       .then(res => res.json())

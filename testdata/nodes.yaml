@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: test-node-1
+  labels:
+    a: "1"
+    b: "2"
+spec: {}
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: test-node-2
+  labels:
+    a: "1"
+    b: "2"
+spec: {}
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: test-node-3
+  labels:
+    a: "1"
+    b: "2"
+spec: {}

@@ -1,0 +1,66 @@
+---
+version: '3.4'
+
+services:
+  node: &node
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ".:/app"
+
+  npm:
+    <<: *node
+    links:
+      - kubeapi
+    entrypoint:
+      - npm
+    command:
+      - start
+
+  sh:
+    <<: *node
+    entrypoint:
+      - bash
+
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.2.18
+    entrypoint: ["etcd"]
+    ports:
+      - "2379:2379"
+    command:
+      - -name=etcd0
+      - -initial-advertise-peer-urls=http://0.0.0.0:2380
+      - -listen-peer-urls=http://0.0.0.0:2380
+      - -listen-client-urls=http://0.0.0.0:2379
+      - -advertise-client-urls=http://0.0.0.0:2379
+      - -initial-cluster-state=new
+      - -initial-cluster=etcd0=http://0.0.0.0:2380
+
+  kubeapi:
+    image: k8s.gcr.io/kube-apiserver-amd64:v1.12.8
+    links:
+      - etcd
+    entrypoint: ["kube-apiserver"]
+    command:
+      - --insecure-bind-address=0.0.0.0
+      - --insecure-port=8080
+      - --logtostderr
+      - --storage-backend=etcd3
+      - --authorization-mode=AlwaysAllow
+      - --etcd-servers=http://etcd:2379
+      - --allow-privileged=true
+      - --cors-allowed-origins=http://*
+    ports:
+      - "8080:8080"
+
+  kubectl:
+    image: lachlanevenson/k8s-kubectl:v1.12.8
+    working_dir: /app
+    links:
+      - "kubeapi"
+    volumes:
+      - "./testdata:/app"
+    environment:
+      KUBECONFIG: /app/kubeconfig.yaml
